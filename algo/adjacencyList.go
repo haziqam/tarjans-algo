@@ -9,13 +9,20 @@ type AdjacencyList map[string][]string
 // Key: node name (string)
 // Value: array of key's neighbors
 
-func ReadAdjacencyList(input string) AdjacencyList{
+func ReadAdjacencyList(input string, directed bool) AdjacencyList{
 	adj := make(AdjacencyList)
 	tokens := strings.Split(input, "\n")
 	for _, token := range tokens {
-		firstToken := string(token[0])
-		secondToken := string(token[1])
-		adj[firstToken] = append(adj[firstToken], secondToken)
+		nodeNames := strings.Split(token, " ")
+		first := string(nodeNames[0])
+		second := string(nodeNames[1])
+
+		if !contains(adj[first], second) {
+			adj[first] = append(adj[first], second)
+		}
+		if !directed && !contains(adj[second], first) {
+			adj[second] = append(adj[second], first)
+		}
 	}
 	return adj
 }
@@ -27,3 +34,13 @@ func (adj AdjacencyList) Print() {
 	}
 	println("==============")
 }
+
+func contains(s []string, text string) bool {
+	for _, element := range s {
+		if element == text {
+			return true
+		} 
+	}
+	return false
+}
+
