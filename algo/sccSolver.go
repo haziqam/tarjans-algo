@@ -4,32 +4,34 @@ import (
 	"github.com/gammazero/deque"
 )
 
-// The SCC and bridge solver is designed using OOP-like logic to
+// The SCC and the bridge solver is designed using OOP-like logic to
 // avoid use of global variable and long parameter list.
 
 type SccSolver struct {
 	graph     	AdjacencyList
+	allNodes 		[]string
 	currentId 	int
 	isOnStack 	map[string]bool
 	ids       	map[string]int
 	lowLink   	map[string]int
 	sccCount 		int
-	sccs      	map[string]int
+	scc					[][]string
 	stack 			deque.Deque[string]
 	solved 			bool
 }
 
 const _UNVISITED int = -1
 
-func (this *SccSolver) Init(graph AdjacencyList) *SccSolver {
+func (this *SccSolver) Init(graph AdjacencyList, allNodes []string) *SccSolver {
 	this.graph = graph
+	this.allNodes = allNodes
 	this.solved = false
 	return this
 }
 
-func (this *SccSolver) GetScc() map[string]int {
+func (this *SccSolver) GetScc() ([][]string) {
 	if !this.solved {this.solve()}
-	return this.sccs
+	return this.scc
 }
 
 func (this *SccSolver) solve() {
@@ -37,16 +39,16 @@ func (this *SccSolver) solve() {
 	this.lowLink = make(map[string]int)
 	this.isOnStack = make(map[string]bool)
 	this.stack = deque.Deque[string]{}
-	this.sccs = make(map[string]int)
+	this.scc = make([][]string, 0)
 	this.currentId = 0
 	this.sccCount = 0
 
-	for nodeName := range this.graph {
+	for _, nodeName := range this.allNodes {
 		this.isOnStack[nodeName] = false
 		this.ids[nodeName] = _UNVISITED
 	}
 
-	for nodeName := range this.graph {
+	for _, nodeName := range this.allNodes  {
 		if this.ids[nodeName] == _UNVISITED {
 			this.dfs(nodeName)
 		}
@@ -73,9 +75,10 @@ func (this *SccSolver) dfs(atNode string) {
 
 	if this.ids[atNode] == this.lowLink[atNode] {
 		top := this.stack.PopBack();
+		this.isOnStack[top] = false
+		this.scc = append(this.scc, []string{})
 		for {
-			this.isOnStack[top] = false
-			this.sccs[top] = this.sccCount
+			this.scc[this.sccCount] = append(this.scc[this.sccCount], top)
 			if atNode == top {break}
 			top = this.stack.PopBack() 
 		}

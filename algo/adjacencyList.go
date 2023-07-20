@@ -2,20 +2,17 @@ package algo
 
 import (
 	"fmt"
-	"strings"
 )
 
 type AdjacencyList map[string][]string
 // Key: node name (string)
 // Value: array of key's neighbors
 
-func ReadAdjacencyList(input string, directed bool) AdjacencyList{
+func ReadAdjacencyList(input [][]string, directed bool) AdjacencyList{
 	adj := make(AdjacencyList)
-	tokens := strings.Split(input, "\n")
-	for _, token := range tokens {
-		nodeNames := strings.Split(token, " ")
-		first := string(nodeNames[0])
-		second := string(nodeNames[1])
+	for _, pair := range input {
+		first := pair[0]
+		second := pair[1]
 
 		if !contains(adj[first], second) {
 			adj[first] = append(adj[first], second)
@@ -25,6 +22,27 @@ func ReadAdjacencyList(input string, directed bool) AdjacencyList{
 		}
 	}
 	return adj
+}
+
+func ReadAllNodes(input [][]string) []string {
+	allNodes := []string{}
+	nodeSet := make(map[string]bool)
+
+	for _, node := range input {
+		first := node[0]
+		second := node[1]
+
+		if (!nodeSet[first]) {
+			allNodes = append(allNodes, first)
+			nodeSet[first] = true
+		}
+		if (!nodeSet[second]) {
+			allNodes = append(allNodes, second)
+			nodeSet[second] = true
+		}
+	}
+
+	return allNodes
 }
 
 func (adj AdjacencyList) Print() {

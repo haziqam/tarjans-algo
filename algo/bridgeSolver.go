@@ -2,6 +2,7 @@ package algo
 
 type BridgeSolver struct {
 	graph     AdjacencyList
+	allNodes  []string
 	currentId int
 	isVisited map[string]bool
 	ids       map[string]int
@@ -12,8 +13,9 @@ type BridgeSolver struct {
 
 const _NOPARENT string = "-"
 
-func (this *BridgeSolver) Init(graph AdjacencyList) *BridgeSolver {
+func (this *BridgeSolver) Init(graph AdjacencyList, allNodes []string) *BridgeSolver {
 	this.graph = graph
+	this.allNodes = allNodes
 	this.solved = false
 	return this
 }
@@ -32,11 +34,11 @@ func (this *BridgeSolver) solve() {
 	this.isVisited = make(map[string]bool)
 	this.bridges = make([][]string, 0)
 
-	for nodeName := range this.graph {
+	for _, nodeName := range this.allNodes {
 		this.isVisited[nodeName] = false
 	}
 
-	for nodeName := range this.graph {
+	for _, nodeName := range this.allNodes {
 		if !this.isVisited[nodeName] {
 			this.dfs(nodeName, _NOPARENT)
 		}
