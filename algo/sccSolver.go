@@ -74,13 +74,14 @@ func (this *SccSolver) dfs(atNode string) {
 	}
 
 	if this.ids[atNode] == this.lowLink[atNode] {
-		top := this.stack.PopBack();
+		top := this.stack.PopBack()
 		this.isOnStack[top] = false
 		this.scc = append(this.scc, []string{})
 		for {
 			this.scc[this.sccCount] = append(this.scc[this.sccCount], top)
 			if atNode == top {break}
 			top = this.stack.PopBack() 
+			this.isOnStack[top] = false
 		}
 		this.sccCount++
 	}

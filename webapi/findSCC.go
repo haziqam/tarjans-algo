@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/haziqam/tarjans-algo/packages/algo"
 )
@@ -37,18 +38,27 @@ func handleFindSCC(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &graphDataContainer)
 	fmt.Println("Graph data: ", graphDataContainer)
 
+	startTime := time.Now()
 	adjacencyList := algo.ReadAdjacencyList(graphDataContainer, true)
 	allNodes := algo.ReadAllNodes(graphDataContainer)
 	solver := new(algo.SccSolver).Init(adjacencyList, allNodes)
 	result := solver.GetScc()
+	executionTime := time.Since(startTime).Nanoseconds()
 	fmt.Println(result)
 
-	resultJSON, err := json.Marshal(result)
+	resultJSON := algoResult{
+		Result: result,
+		TimeNanoseconds: int(executionTime),
+	}
+
+	fmt.Println(resultJSON)
+
+	marshalledResult, err := json.Marshal(resultJSON)
 
 	if (err != nil) {
 		http.Error(w, "Error writing response.", http.StatusInternalServerError)
 		return
 	}
 
-	w.Write(resultJSON)
+	w.Write(marshalledResult)
 }
